@@ -110,8 +110,8 @@ if user_input and user_input.strip():
         "timestamp": timestamp_now
     })
 
-    # Clear input
-    st.session_state.input_text = ""
+    # Clear input properly
+    st.session_state["input_text"] = ""
 
     # Send to OpenAI
     openai.beta.threads.messages.create(

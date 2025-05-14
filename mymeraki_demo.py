@@ -14,7 +14,7 @@ st.set_page_config(
     page_icon="💬"
 )
 
-# Persistent logo and input styling
+# CSS for fixed header and footer and spacing fix
 st.markdown("""
     <style>
     .meraki-header {
@@ -24,17 +24,19 @@ st.markdown("""
         background-color: white;
         text-align: center;
         z-index: 1000;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        padding: 10px 0;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .chat-input-container {
         position: fixed;
-        bottom: 20px;
+        bottom: 0;
         left: 0;
         right: 0;
         text-align: center;
+        padding: 10px 0;
+        background-color: white;
         z-index: 1000;
+        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     }
     .chat-input-box input {
         width: 60%;
@@ -44,30 +46,32 @@ st.markdown("""
         font-size: 16px;
         background-color: #fceeea;
     }
-    .spacer {
+    .spacer-top {
         margin-top: 100px;
-        margin-bottom: 80px;
+    }
+    .spacer-bottom {
+        margin-bottom: 100px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Fixed logo
+# Fixed logo header
 st.markdown("<div class='meraki-header'>", unsafe_allow_html=True)
 st.image("meraki-logo.png", width=180)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Spacer to push content below fixed header and above fixed input
-st.markdown("<div class='spacer'></div>", unsafe_allow_html=True)
+# Spacers to avoid overlapping content
+st.markdown("<div class='spacer-top'></div>", unsafe_allow_html=True)
 
 # Init session variables
 if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
     st.session_state.messages = []
-if "input" not in st.session_state:
-    st.session_state.input = ""
+if "input_text" not in st.session_state:
+    st.session_state.input_text = ""
 
-# Display messages
+# Display chat messages
 chat_placeholder = st.container()
 with chat_placeholder:
     for msg in st.session_state.messages:
@@ -86,11 +90,14 @@ with chat_placeholder:
             unsafe_allow_html=True
         )
 
+# Add bottom spacer so last message isn't hidden behind input
+st.markdown("<div class='spacer-bottom'></div>", unsafe_allow_html=True)
+
 # Bottom fixed input box
 st.markdown("<div class='chat-input-container'>", unsafe_allow_html=True)
 user_input = st.text_input(
     label="",
-    value=st.session_state.input,
+    value=st.session_state.input_text,
     placeholder="Type your message here...",
     key="input_box",
     label_visibility="collapsed"
@@ -98,8 +105,7 @@ user_input = st.text_input(
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Handle message submission via Enter key
-if user_input and user_input != st.session_state.input:
-    st.session_state.input = user_input
+if user_input and user_input != st.session_state.input_text:
     timestamp_now = datetime.now().strftime("%H:%M")
     st.session_state.messages.append({
         "role": "user",
@@ -107,27 +113,7 @@ if user_input and user_input != st.session_state.input:
         "timestamp": timestamp_now
     })
 
-    # Clear input
-    st.session_state.input = ""
-
-    # Refresh chat
-    chat_placeholder.empty()
-    with chat_placeholder:
-        for msg in st.session_state.messages:
-            align = "right" if msg["role"] == "user" else "left"
-            bubble_color = "#fceeea" if msg["role"] == "user" else "#f5f5f5"
-            timestamp = msg.get("timestamp", "")
-            st.markdown(
-                f"""
-                <div style='text-align: {align}; padding: 4px;'>
-                    <div style='display: inline-block; background: {bubble_color}; padding: 10px 14px; margin: 4px; border-radius: 18px; max-width: 75%; font-family: sans-serif;'>
-                        <div>{msg['content']}</div>
-                        <div style='font-size: 10px; color: #888; text-align: right; margin-top: 4px;'>{timestamp}</div>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+    st.session_state.input_text = ""  # Clear input
 
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
@@ -161,4 +147,5 @@ if user_input and user_input != st.session_state.input:
         "content": last_message,
         "timestamp": timestamp_now
     })
+
 

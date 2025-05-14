@@ -50,9 +50,6 @@ if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
     st.session_state.messages = []
-# Use separate key for input
-if "chat_input" not in st.session_state:
-    st.session_state.chat_input = ""
 
 # Display chat messages
 def show_messages():
@@ -73,56 +70,33 @@ show_messages()
 # Spacer so last message isn't hidden
 st.markdown("<div class='spacer-bottom'></div>", unsafe_allow_html=True)
 
-# Input at bottom
+# Input at bottom: use value="" to auto-clear
 st.markdown("<div class='fixed-footer'><div class='chat-input'>", unsafe_allow_html=True)
 user_input = st.text_input(
     label="",
-    value=st.session_state.chat_input,
     placeholder="Type your message here...",
+    value="",  # Always clear after rerun
     key="chat_input",
     label_visibility="collapsed"
 )
 st.markdown("</div></div>", unsafe_allow_html=True)
 
-# On enter: send and clear
+# On enter: send
 if user_input and user_input.strip():
     ts = datetime.now().strftime("%H:%M")
     # append user message
-    st.session_state.messages.append({
-        "role": "user",
-        "content": user_input,
-        "timestamp": ts
-    })
-    # clear input state
-    st.session_state.chat_input = ""
-
+    st.session_state.messages.append({"role":"user","content":user_input,"timestamp":ts})
     # send to OpenAI
-    openai.beta.threads.messages.create(
-        thread_id=st.session_state.thread_id,
-        role="user",
-        content=user_input
-    )
-    run = openai.beta.threads.runs.create(
-        thread_id=st.session_state.thread_id,
-        assistant_id=ASSISTANT_ID
-    )
+    openai.beta.threads.messages.create(thread_id=st.session_state.thread_id, role="user", content=user_input)
+    run = openai.beta.threads.runs.create(thread_id=st.session_state.thread_id, assistant_id=ASSISTANT_ID)
     with st.spinner("Typing..."):
         while True:
-            status = openai.beta.threads.runs.retrieve(
-                thread_id=st.session_state.thread_id,
-                run_id=run.id
-            )
-            if status.status == "completed":
-                break
+            status = openai.beta.threads.runs.retrieve(thread_id=st.session_state.thread_id, run_id=run.id)
+            if status.status == "completed": break
             time.sleep(1)
-    # append assistant reply
     resp = openai.beta.threads.messages.list(thread_id=st.session_state.thread_id)
     text = resp.data[0].content[0].text.value
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": text,
-        "timestamp": datetime.now().strftime("%H:%M")
-    })
-    # rerun to show updates
+    st.session_state.messages.append({"role":"assistant","content":text,"timestamp":datetime.now().strftime("%H:%M")})
+    # rerun to refresh chat and clear input
     st.experimental_rerun()
 

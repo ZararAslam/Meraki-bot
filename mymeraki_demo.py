@@ -10,7 +10,7 @@ ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 # Page settings
 st.set_page_config(page_title="MyMeraki AI Chat", layout="wide", page_icon="💬")
 
-# CSS for sticky header, chat bubbles, and footer
+# CSS for layout
 st.markdown("""
     <style>
     .fixed-header {
@@ -50,21 +50,19 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Sticky header with Meraki logo
+# Sticky header
 st.markdown("<div class='fixed-header'>", unsafe_allow_html=True)
 st.image("meraki-logo.png", width=180)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Add spacing to prevent overlap with fixed elements
+# Add top spacer
 st.markdown("<div class='spacer-top'></div>", unsafe_allow_html=True)
 
-# Session state setup
+# Init session state
 if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
     st.session_state.messages = []
-if "input_text" not in st.session_state:
-    st.session_state.input_text = ""
 
 # Chat display
 chat_container = st.container()
@@ -85,29 +83,36 @@ with chat_container:
             unsafe_allow_html=True
         )
 
-# Add bottom spacer to avoid input overlap
+# Bottom spacer
 st.markdown("<div class='spacer-bottom'></div>", unsafe_allow_html=True)
 
-# Fixed input footer
+# Input area at bottom
 st.markdown("<div class='fixed-footer'><div class='chat-input'>", unsafe_allow_html=True)
 user_input = st.text_input(
     label="",
-    value=st.session_state.input_text,
     placeholder="Type your message here...",
-    key="input_text",
+    key="chat_input",
     label_visibility="collapsed"
 )
 st.markdown("</div></div>", unsafe_allow_html=True)
 
-# On message submission
+# Handle message
 if user_input and user_input.strip():
+    timestamp_now = datetime.now().strftime("%H:%M")
     st.session_state.messages.append({
         "role": "user",
         "content": user_input,
-        "timestamp": datetime.now().strftime("%H:%M")
+        "timestamp": timestamp_now
     })
 
-    st.session_state["input_text"] = ""
+    # Clear text input by resetting its key through rerun
+    st.text_input(
+        label="",
+        placeholder="Type your message here...",
+        key="chat_input",
+        label_visibility="collapsed",
+        value=""
+    )
 
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
@@ -142,3 +147,5 @@ if user_input and user_input.strip():
     })
 
     st.experimental_rerun()
+
+

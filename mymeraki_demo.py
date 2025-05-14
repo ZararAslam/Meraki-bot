@@ -14,16 +14,48 @@ st.set_page_config(
     page_icon="💬"
 )
 
-# Centered logo
-st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+# Persistent logo using fixed position
+st.markdown("""
+    <style>
+    .meraki-logo-fixed {
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background-color: white;
+        padding: 10px;
+    }
+    .chat-input-container {
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        z-index: 1000;
+    }
+    .chat-input-box input {
+        width: 60%;
+        padding: 12px 20px;
+        border-radius: 25px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        background-color: #fceeea;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.markdown("<div class='meraki-logo-fixed'>", unsafe_allow_html=True)
 st.image("meraki-logo.png", width=180)
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("</div><br><br><br><br>", unsafe_allow_html=True)
 
 # Init session variables
 if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
     st.session_state.messages = []
+if "input" not in st.session_state:
+    st.session_state.input = ""
 
 # Display messages ABOVE input
 chat_placeholder = st.container()
@@ -46,51 +78,29 @@ with chat_placeholder:
             unsafe_allow_html=True
         )
 
-# Style for sleek chat bubble input fixed to bottom
-st.markdown("""
-<style>
-    .chat-input-container {
-        position: fixed;
-        bottom: 20px;
-        left: 0;
-        right: 0;
-        text-align: center;
-    }
-    .chat-input-box input {
-        width: 60%;
-        padding: 12px 20px;
-        border-radius: 25px;
-        border: 1px solid #ccc;
-        font-size: 16px;
-        background-color: #fceeea;
-    }
-    .chat-send-button {
-        padding: 8px 20px;
-        font-size: 16px;
-        margin-left: 10px;
-        border-radius: 25px;
-        border: none;
-        background-color: #7b4e45;
-        color: white;
-        cursor: pointer;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# Create bottom input UI
+# Custom input field at the bottom
 st.markdown("<div class='chat-input-container'>", unsafe_allow_html=True)
-user_input = st.text_input("", placeholder="Type your message here...", key="input", label_visibility="collapsed")
-send_btn = st.button("Send", key="send")
+user_input = st.text_input(
+    label="",
+    value=st.session_state.input,
+    placeholder="Type your message here...",
+    key="input_box",
+    label_visibility="collapsed"
+)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Process message (append user's message BEFORE getting bot reply)
-if send_btn and user_input:
+# Handle message submission via Enter key
+if user_input and user_input != st.session_state.input:
+    st.session_state.input = user_input
     timestamp_now = datetime.now().strftime("%H:%M")
     st.session_state.messages.append({
         "role": "user",
         "content": user_input,
         "timestamp": timestamp_now
     })
+
+    # Clear input
+    st.session_state.input = ""
 
     # Refresh chat immediately after user sends message
     chat_placeholder.empty()

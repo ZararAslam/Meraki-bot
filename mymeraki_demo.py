@@ -9,11 +9,11 @@ ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 # Page settings
 st.set_page_config(page_title="MyMeraki AI Chat", layout="centered")
 
-# Display centered logo
+# Display centered Meraki logo
 st.markdown(
     """
     <div style='text-align: center;'>
-        st.image("meraki-logo.png", width=180)
+        <img src='meraki-logo.png' width='180'/>
     </div>
     """,
     unsafe_allow_html=True
@@ -23,7 +23,7 @@ st.markdown(
 if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
-    st.session_state.messages = []  # No welcome message for a clean start
+    st.session_state.messages = []  # Start with no messages
 
 # Chat display in bubbles
 chat_placeholder = st.empty()
@@ -42,7 +42,6 @@ with chat_placeholder.container():
             """,
             unsafe_allow_html=True
         )
-
 
 # Input box fixed at bottom
 with st.form(key="chat_form", clear_on_submit=True):
@@ -84,4 +83,3 @@ if send_btn and user_input:
 
     # Rerun the app to auto-scroll
     st.experimental_rerun()
-

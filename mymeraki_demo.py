@@ -92,15 +92,15 @@ st.markdown("<div class='spacer-bottom'></div>", unsafe_allow_html=True)
 st.markdown("<div class='fixed-footer'><div class='chat-input'>", unsafe_allow_html=True)
 user_input = st.text_input(
     label="",
+    value=st.session_state.input_text,
     placeholder="Type your message here...",
-    key="chat_input",
+    key="input_text",
     label_visibility="collapsed"
 )
 st.markdown("</div></div>", unsafe_allow_html=True)
 
 # Message send trigger
-if user_input and user_input != st.session_state.input_text:
-    st.session_state.input_text = user_input
+if user_input and user_input.strip():
     timestamp_now = datetime.now().strftime("%H:%M")
 
     # Show user's message
@@ -112,7 +112,6 @@ if user_input and user_input != st.session_state.input_text:
 
     # Clear input
     st.session_state.input_text = ""
-    st.session_state.chat_input = ""
 
     # Send to OpenAI
     openai.beta.threads.messages.create(
@@ -151,5 +150,4 @@ if user_input and user_input != st.session_state.input_text:
 
     # Force scroll to latest message by rerunning
     st.experimental_rerun()
-
 

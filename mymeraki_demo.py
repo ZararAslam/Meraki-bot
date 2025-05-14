@@ -26,7 +26,6 @@ st.markdown("""
 .chat-bubble {
   display: inline-block; padding: 10px 14px; margin: 4px;
   border-radius: 18px; max-width: 75%; font-family: sans-serif;
-  position: relative;
 }
 .chat-bubble .timestamp {
   font-size: 10px; color: #888; text-align: right; margin-top: 4px;
@@ -70,31 +69,44 @@ show_messages()
 # Spacer so last message isn't hidden
 st.markdown("<div class='spacer-bottom'></div>", unsafe_allow_html=True)
 
-# Input at bottom: use value="" to auto-clear
+# Input at bottom: always starts empty
 st.markdown("<div class='fixed-footer'><div class='chat-input'>", unsafe_allow_html=True)
 user_input = st.text_input(
     label="",
     placeholder="Type your message here...",
-    value="",  # Always clear after rerun
+    value="",  # cleared each run
     key="chat_input",
     label_visibility="collapsed"
 )
 st.markdown("</div></div>", unsafe_allow_html=True)
 
 # On enter: send
-if user_input and user_input.strip():
+def send_message(text):
     ts = datetime.now().strftime("%H:%M")
-    # append user message
-    st.session_state.messages.append({"role":"user","content":user_input,"timestamp":ts})
-    # send to OpenAI
-    openai.beta.threads.messages.create(thread_id=st.session_state.thread_id, role="user", content=user_input)
-    run = openai.beta.threads.runs.create(thread_id=st.session_state.thread_id, assistant_id=ASSISTANT_ID)
+    st.session_state.messages.append({"role":"user","content":text,"timestamp":ts})
+    openai.beta.threads.messages.create(
+        thread_id=st.session_state.thread_id,
+        role="user",
+        content=text
+    )
+    run = openai.beta.threads.runs.create(
+        thread_id=st.session_state.thread_id,
+        assistant_id=ASSISTANT_ID
+    )
     with st.spinner("Typing..."):
         while True:
-            status = openai.beta.threads.runs.retrieve(thread_id=st.session_state.thread_id, run_id=run.id)
-            if status.status == "completed": break
+            status = openai.beta.threads.runs.retrieve(
+                thread_id=st.session_state.thread_id,
+                run_id=run.id
+            )
+            if status.status == "completed":
+                break
             time.sleep(1)
     resp = openai.beta.threads.messages.list(thread_id=st.session_state.thread_id)
-    text = resp.data[0].content[0].text.value
-    st.session_state.messages.append({"role":"assistant","content":text,"timestamp":datetime.now().strftime("%H:%M")})
+    reply = resp.data[0].content[0].text.value
+    st.session_state.messages.append({"role":"assistant","content":reply,"timestamp":datetime.now().strftime("%H:%M")})
+
+if user_input and user_input.strip():
+    send_message(user_input)
+    # no experimental_rerun needed; Streamlit auto-reruns on widget change
   

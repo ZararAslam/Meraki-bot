@@ -97,6 +97,4 @@ if user_input and user_input.strip():
     resp = openai.beta.threads.messages.list(thread_id=st.session_state.thread_id)
     text = resp.data[0].content[0].text.value
     st.session_state.messages.append({"role":"assistant","content":text,"timestamp":datetime.now().strftime("%H:%M")})
-    # rerun to refresh chat and clear input
-    st.experimental_rerun()
-
+  

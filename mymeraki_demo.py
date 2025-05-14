@@ -1,6 +1,7 @@
 import streamlit as st
 import openai
 import time
+from datetime import datetime
 
 # Configure OpenAI
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -17,24 +18,14 @@ if "thread_id" not in st.session_state:
     st.session_state.thread_id = thread.id
     st.session_state.messages = []
 
-# Input field without title or label
-# Input field without title or label
-user_input = st.text_input(
-    label="",
-    placeholder="Type your message here...",
-    value="",  # always start empty
-    key="input",
-    label_visibility="collapsed"
-)
-
-# Handle user input and fetch assistant response and fetch assistant response
-if user_input and user_input.strip():
+# Callback to handle sending a message
+def send_message():
+    user_input = st.session_state.input
+    if not user_input:
+        return
     # Append user message immediately
     st.session_state.messages.append({"role": "user", "content": user_input})
-    # Clear the input box instantly
-    st.session_state["input"] = ""
-
-    # Send to OpenAI
+    # Call OpenAI
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
         role="user",
@@ -44,30 +35,34 @@ if user_input and user_input.strip():
         thread_id=st.session_state.thread_id,
         assistant_id=ASSISTANT_ID
     )
+    with st.spinner("Typing..."):
+        while True:
+            status = openai.beta.threads.runs.retrieve(
+                thread_id=st.session_state.thread_id,
+                run_id=run.id
+            )
+            if status.status == "completed":
+                break
+            time.sleep(1)
+    # Append assistant reply
+    resp = openai.beta.threads.messages.list(thread_id=st.session_state.thread_id)
+    reply = resp.data[0].content[0].text.value
+    st.session_state.messages.append({"role": "assistant", "content": reply})
+    # Clear input box
+    st.session_state.input = ""
 
-    # Wait for completion
-    while True:
-        run_status = openai.beta.threads.runs.retrieve(
-            thread_id=st.session_state.thread_id,
-            run_id=run.id
-        )
-        if run_status.status == "completed":
-            break
-        time.sleep(1)
+# Input field with on_change callback
+st.text_input(
+    label="",
+    placeholder="Type your message here...",
+    key="input",
+    on_change=send_message,
+    label_visibility="collapsed"
+)
 
-    # Retrieve assistant reply and append
-    messages = openai.beta.threads.messages.list(
-        thread_id=st.session_state.thread_id
-    )
-    last_message = messages.data[0].content[0].text.value
-    st.session_state.messages.append({"role": "assistant", "content": last_message})
-
-# Display all messages
+# Display chat history
 for msg in st.session_state.messages:
-    role = "🧑" if msg["role"] == "user" else "🤖"
-    st.write(f"{role}: {msg['content']}")
-for msg in st.session_state.messages:
-    role = "🧑" if msg["role"] == "user" else "🤖"
-    st.write(f"{role}: {msg['content']}")
+    prefix = "🧑" if msg["role"] == "user" else "🤖"
+    st.write(f"{prefix}: {msg['content']}")
 
 

@@ -9,15 +9,10 @@ ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 # Page settings
 st.set_page_config(page_title="MyMeraki AI Chat", layout="centered")
 
-# Display centered Meraki logo
-st.markdown(
-    """
-    <div style='text-align: center;'>
-        <img src='meraki-logo.png' width='180'/>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Display centered Meraki logo using st.image
+st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+st.image("meraki-logo.png", width=180)
+st.markdown("</div>", unsafe_allow_html=True)
 
 # Initialize thread and message history
 if "thread_id" not in st.session_state:
@@ -43,7 +38,7 @@ with chat_placeholder.container():
             unsafe_allow_html=True
         )
 
-# Input box fixed at bottom
+# Input box at bottom
 with st.form(key="chat_form", clear_on_submit=True):
     user_input = st.text_input("Type your message here...", key="input")
     send_btn = st.form_submit_button("Send")
@@ -81,5 +76,6 @@ if send_btn and user_input:
     last_message = messages.data[0].content[0].text.value
     st.session_state.messages.append({"role": "assistant", "content": last_message})
 
-    # Rerun the app to auto-scroll
+    # Auto-scroll simulation by re-running the app
     st.experimental_rerun()
+

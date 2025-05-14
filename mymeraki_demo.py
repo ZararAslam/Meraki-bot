@@ -7,12 +7,9 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 
 # Display centered company logo
-st.markdown(
-    "<div style='text-align: center;'>"
-    "<img src='meraki-logo.png' width='180'/>"
-    "</div>",
-    unsafe_allow_html=True
-)
+st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+st.image("meraki-logo.png", width=180)
+st.markdown("</div>", unsafe_allow_html=True)
 
 # Initialize session state for threads and messages
 if "thread_id" not in st.session_state:
@@ -65,4 +62,5 @@ if user_input:
 for msg in st.session_state.messages:
     role = "🧑" if msg["role"] == "user" else "🤖"
     st.write(f"{role}: {msg['content']}")
+
 

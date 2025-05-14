@@ -9,22 +9,21 @@ ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 # Page settings
 st.set_page_config(page_title="MyMeraki AI Chat", layout="centered")
 
-# Display Meraki logo (add logo file to project folder)
-st.image("meraki-logo.png", width=180)
-
-# Title
-st.markdown("""
-    <h2 style='text-align: center; font-family: serif; color: #7b4e45;'>Chat with Meraki AI 👗</h2>
-    <hr style='border-top: 1px solid #e0cfc2;'>
-""", unsafe_allow_html=True)
+# Display centered logo
+st.markdown(
+    """
+    <div style='text-align: center;'>
+        st.image("meraki-logo.png", width=180)
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # Initialize thread and message history
 if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
-    st.session_state.messages = [
-        {"role": "assistant", "content": "Hey lovely! 😊 I'm here to help with anything — from bridal looks to order questions. What would you like to ask? 💫"}
-    ]
+    st.session_state.messages = []  # No welcome message for a clean start
 
 # Chat display in bubbles
 chat_placeholder = st.empty()
@@ -43,6 +42,7 @@ with chat_placeholder.container():
             """,
             unsafe_allow_html=True
         )
+
 
 # Input box fixed at bottom
 with st.form(key="chat_form", clear_on_submit=True):

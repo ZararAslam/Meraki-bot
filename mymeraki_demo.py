@@ -10,21 +10,23 @@ ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 # Page settings
 st.set_page_config(
     page_title="MyMeraki AI Chat",
-    layout="centered",
+    layout="wide",
     page_icon="💬"
 )
 
-# Persistent logo using fixed position
+# Persistent logo and input styling
 st.markdown("""
     <style>
-    .meraki-logo-fixed {
+    .meraki-header {
         position: fixed;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000;
+        top: 0;
+        width: 100%;
         background-color: white;
-        padding: 10px;
+        text-align: center;
+        z-index: 1000;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     .chat-input-container {
         position: fixed;
@@ -42,12 +44,20 @@ st.markdown("""
         font-size: 16px;
         background-color: #fceeea;
     }
+    .spacer {
+        margin-top: 100px;
+        margin-bottom: 80px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<div class='meraki-logo-fixed'>", unsafe_allow_html=True)
+# Fixed logo
+st.markdown("<div class='meraki-header'>", unsafe_allow_html=True)
 st.image("meraki-logo.png", width=180)
-st.markdown("</div><br><br><br><br>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
+
+# Spacer to push content below fixed header and above fixed input
+st.markdown("<div class='spacer'></div>", unsafe_allow_html=True)
 
 # Init session variables
 if "thread_id" not in st.session_state:
@@ -57,10 +67,8 @@ if "thread_id" not in st.session_state:
 if "input" not in st.session_state:
     st.session_state.input = ""
 
-# Display messages ABOVE input
+# Display messages
 chat_placeholder = st.container()
-
-# Show existing messages first
 with chat_placeholder:
     for msg in st.session_state.messages:
         align = "right" if msg["role"] == "user" else "left"
@@ -78,7 +86,7 @@ with chat_placeholder:
             unsafe_allow_html=True
         )
 
-# Custom input field at the bottom
+# Bottom fixed input box
 st.markdown("<div class='chat-input-container'>", unsafe_allow_html=True)
 user_input = st.text_input(
     label="",
@@ -102,7 +110,7 @@ if user_input and user_input != st.session_state.input:
     # Clear input
     st.session_state.input = ""
 
-    # Refresh chat immediately after user sends message
+    # Refresh chat
     chat_placeholder.empty()
     with chat_placeholder:
         for msg in st.session_state.messages:
@@ -121,7 +129,6 @@ if user_input and user_input != st.session_state.input:
                 unsafe_allow_html=True
             )
 
-    # Send user message to OpenAI
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
         role="user",

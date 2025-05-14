@@ -10,7 +10,7 @@ ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 st.set_page_config(page_title="MyMeraki AI Chat", layout="centered")
 
 # Display Meraki logo (add logo file to project folder)
-st.image("🔴meraki-logo.png", width=180)
+st.image("meraki-logo.png", width=180)
 
 # Title
 st.markdown("""

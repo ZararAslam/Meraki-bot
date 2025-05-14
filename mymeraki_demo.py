@@ -7,22 +7,13 @@ from datetime import datetime
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 
-# Page setup: white background + icon
+# Page setup
 st.set_page_config(page_title="MyMeraki AI Chat", layout="wide", page_icon="💬")
 
-# --- Force white background everywhere ---
+# CSS: white background, sticky header/footer, chat bubbles, spacing
 st.markdown("""
 <style>
-/* Streamlit container classes */
-body, .stApp, .css-18e3th9, .css-1d391kg, .block-container {
-  background-color: white !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# --- CSS: sticky header/footer, chat bubbles, spacing ---
-st.markdown("""
-<style>
+body, .stApp {background-color: white !important;}
 .fixed-header {
   position: fixed; top: 0; width: 100%; background: white; z-index: 999;
   text-align: center; padding: 10px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -47,56 +38,43 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- Sticky logo only (no title/text) ---
+# Header (logo)
 st.markdown("<div class='fixed-header'>", unsafe_allow_html=True)
 st.image("meraki-logo.png", width=180)
 st.markdown("</div>", unsafe_allow_html=True)
-
-# push chat below the header
+# Push chat down below header
 st.markdown("<div class='spacer-top'></div>", unsafe_allow_html=True)
 
-# --- Session state setup ---
+# Initialize session state
 if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
     st.session_state.messages = []
+if "chat_input" not in st.session_state:
+    st.session_state.chat_input = ""
 
-# --- Show chat bubbles ---
-def show_messages():
-    for msg in st.session_state.messages:
-        align = "right" if msg["role"] == "user" else "left"
-        color = "#fceeea" if msg["role"] == "user" else "#f5f5f5"
-        ts = msg.get("timestamp", datetime.now().strftime("%H:%M"))
-        st.markdown(f"""
-        <div style='text-align: {align}; padding: 4px;'>
-          <div class='chat-bubble' style='background:{color};'>
-            <div>{msg['content']}</div>
-            <div class='timestamp'>{ts}</div>
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
+# Container for chat messages
+gchat = st.container()
 
-show_messages()
-
-# bottom spacer so last bubble isn't hidden
-st.markdown("<div class='spacer-bottom'></div>", unsafe_allow_html=True)
-
-# --- Fixed footer input (Enter to send only) ---
+# Fixed footer input
 st.markdown("<div class='fixed-footer'><div class='chat-input'>", unsafe_allow_html=True)
 user_input = st.text_input(
     label="",
     placeholder="Type your message here...",
-    value="",
     key="chat_input",
+    value=st.session_state.chat_input,
     label_visibility="collapsed"
 )
 st.markdown("</div></div>", unsafe_allow_html=True)
 
-# --- On Enter: append user, call OpenAI, append assistant ---
+# On Enter: process input, append user & assistant instantaneously
 if user_input and user_input.strip():
     ts = datetime.now().strftime("%H:%M")
+    # Append user message
     st.session_state.messages.append({"role":"user","content":user_input,"timestamp":ts})
-
+    # Clear input to trigger rerun
+    st.session_state.chat_input = ""
+    # Call OpenAI and append assistant reply
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
         role="user",
@@ -119,7 +97,20 @@ if user_input and user_input.strip():
     reply = resp.data[0].content[0].text.value
     st.session_state.messages.append({"role":"assistant","content":reply,"timestamp":datetime.now().strftime("%H:%M")})
 
-    # no need for explicit rerun; Streamlit auto-reruns on text_input change
+# Display chat messages below processing
+with gchat:
+    for msg in st.session_state.messages:
+        align = "right" if msg["role"] == "user" else "left"
+        color = "#fceeea" if msg["role"] == "user" else "#f5f5f5"
+        ts = msg.get("timestamp", "")
+        st.markdown(f"""
+        <div style='text-align: {align}; padding: 4px;'>
+          <div class='chat-bubble' style='background:{color};'>
+            <div>{msg['content']}</div>
+            <div class='timestamp'>{ts}</div>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-
-  
+# Spacer so last bubble isn't hidden behind input
+st.markdown("<div class='spacer-bottom'></div>", unsafe_allow_html=True)

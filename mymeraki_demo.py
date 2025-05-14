@@ -1,13 +1,18 @@
 import streamlit as st
 import openai
 import time
+from datetime import datetime
 
 # Set your OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 
-# Page settings
-st.set_page_config(page_title="MyMeraki AI Chat", layout="centered")
+# Page settings with custom favicon (replace URL if needed)
+st.set_page_config(
+    page_title="MyMeraki AI Chat",
+    layout="centered",
+    page_icon="💬"  # You can use a custom .ico path instead
+)
 
 # Display centered Meraki logo using st.image
 st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
@@ -20,18 +25,19 @@ if "thread_id" not in st.session_state:
     st.session_state.thread_id = thread.id
     st.session_state.messages = []  # Start with no messages
 
-# Chat display in bubbles
+# Show chat in bubbles
 chat_placeholder = st.empty()
-
 with chat_placeholder.container():
     for msg in st.session_state.messages:
         align = "right" if msg["role"] == "user" else "left"
         bubble_color = "#fceeea" if msg["role"] == "user" else "#f5f5f5"
+        timestamp = msg.get("timestamp", "")
         st.markdown(
             f"""
             <div style='text-align: {align}; padding: 4px;'>
                 <div style='display: inline-block; background: {bubble_color}; padding: 10px 14px; margin: 4px; border-radius: 18px; max-width: 75%; font-family: sans-serif;'>
-                    {msg['content']}
+                    <div>{msg['content']}</div>
+                    <div style='font-size: 10px; color: #888; text-align: right; margin-top: 4px;'>{timestamp}</div>
                 </div>
             </div>
             """,
@@ -45,7 +51,12 @@ with st.form(key="chat_form", clear_on_submit=True):
 
 # Handle input and response
 if send_btn and user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})
+    timestamp_now = datetime.now().strftime("%H:%M")
+    st.session_state.messages.append({
+        "role": "user",
+        "content": user_input,
+        "timestamp": timestamp_now
+    })
 
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
@@ -58,7 +69,7 @@ if send_btn and user_input:
         assistant_id=ASSISTANT_ID
     )
 
-    with st.spinner("Thinking..."):
+    with st.spinner("Typing..."):
         while True:
             run_status = openai.beta.threads.runs.retrieve(
                 thread_id=st.session_state.thread_id,
@@ -74,9 +85,13 @@ if send_btn and user_input:
 
     # Get latest assistant message
     last_message = messages.data[0].content[0].text.value
-    st.session_state.messages.append({"role": "assistant", "content": last_message})
+    timestamp_now = datetime.now().strftime("%H:%M")
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": last_message,
+        "timestamp": timestamp_now
+    })
 
     # Auto-scroll simulation by re-running the app
     st.experimental_rerun()
-
 

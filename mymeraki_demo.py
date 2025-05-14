@@ -18,14 +18,16 @@ if "thread_id" not in st.session_state:
     st.session_state.messages = []
 
 # Input field without title or label
+# Input field without title or label
 user_input = st.text_input(
     label="",
     placeholder="Type your message here...",
+    value="",  # always start empty
     key="input",
     label_visibility="collapsed"
 )
 
-# Handle user input and fetch assistant response
+# Handle user input and fetch assistant response and fetch assistant response
 if user_input and user_input.strip():
     # Append user message immediately
     st.session_state.messages.append({"role": "user", "content": user_input})
@@ -67,6 +69,5 @@ for msg in st.session_state.messages:
 for msg in st.session_state.messages:
     role = "🧑" if msg["role"] == "user" else "🤖"
     st.write(f"{role}: {msg['content']}")
-
 
 

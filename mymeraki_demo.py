@@ -7,44 +7,39 @@ from datetime import datetime
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 
-# Page settings
-st.set_page_config(
-    page_title="MyMeraki AI Chat",
-    layout="wide",
-    page_icon="💬"
-)
+# Page config
+st.set_page_config(page_title="MyMeraki AI Chat", layout="wide", page_icon="💬")
 
-# CSS for fixed header and footer and spacing fix
+# CSS for sticky header and footer
 st.markdown("""
     <style>
-    .meraki-header {
+    .fixed-header {
         position: fixed;
         top: 0;
         width: 100%;
-        background-color: white;
+        background: white;
+        z-index: 999;
         text-align: center;
-        z-index: 1000;
         padding: 10px 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
-    .chat-input-container {
+    .fixed-footer {
         position: fixed;
         bottom: 0;
-        left: 0;
-        right: 0;
+        width: 100%;
+        background: white;
+        z-index: 999;
         text-align: center;
-        padding: 10px 0;
-        background-color: white;
-        z-index: 1000;
-        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        padding: 12px 0;
+        box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1);
     }
-    .chat-input-box input {
+    .chat-input input {
         width: 60%;
-        padding: 12px 20px;
+        padding: 10px 16px;
         border-radius: 25px;
         border: 1px solid #ccc;
         font-size: 16px;
-        background-color: #fceeea;
+        background: #fceeea;
     }
     .spacer-top {
         margin-top: 100px;
@@ -55,15 +50,15 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Fixed logo header
-st.markdown("<div class='meraki-header'>", unsafe_allow_html=True)
+# Sticky header
+st.markdown("<div class='fixed-header'>", unsafe_allow_html=True)
 st.image("meraki-logo.png", width=180)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Spacers to avoid overlapping content
+# Spacers to prevent content hiding behind fixed areas
 st.markdown("<div class='spacer-top'></div>", unsafe_allow_html=True)
 
-# Init session variables
+# Session state init
 if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
@@ -71,9 +66,9 @@ if "thread_id" not in st.session_state:
 if "input_text" not in st.session_state:
     st.session_state.input_text = ""
 
-# Display chat messages
-chat_placeholder = st.container()
-with chat_placeholder:
+# Chat display
+chat_container = st.container()
+with chat_container:
     for msg in st.session_state.messages:
         align = "right" if msg["role"] == "user" else "left"
         bubble_color = "#fceeea" if msg["role"] == "user" else "#f5f5f5"
@@ -90,31 +85,36 @@ with chat_placeholder:
             unsafe_allow_html=True
         )
 
-# Add bottom spacer so last message isn't hidden behind input
+# Bottom spacing so chat doesn't get hidden behind the input
 st.markdown("<div class='spacer-bottom'></div>", unsafe_allow_html=True)
 
-# Bottom fixed input box
-st.markdown("<div class='chat-input-container'>", unsafe_allow_html=True)
+# Sticky input at the bottom
+st.markdown("<div class='fixed-footer'><div class='chat-input'>", unsafe_allow_html=True)
 user_input = st.text_input(
     label="",
-    value=st.session_state.input_text,
     placeholder="Type your message here...",
-    key="input_box",
+    key="chat_input",
     label_visibility="collapsed"
 )
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("</div></div>", unsafe_allow_html=True)
 
-# Handle message submission via Enter key
+# Message send trigger
 if user_input and user_input != st.session_state.input_text:
+    st.session_state.input_text = user_input
     timestamp_now = datetime.now().strftime("%H:%M")
+
+    # Show user's message
     st.session_state.messages.append({
         "role": "user",
         "content": user_input,
         "timestamp": timestamp_now
     })
 
-    st.session_state.input_text = ""  # Clear input
+    # Clear input
+    st.session_state.input_text = ""
+    st.session_state.chat_input = ""
 
+    # Send to OpenAI
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
         role="user",
@@ -142,10 +142,14 @@ if user_input and user_input != st.session_state.input_text:
 
     last_message = messages.data[0].content[0].text.value
     timestamp_now = datetime.now().strftime("%H:%M")
+
     st.session_state.messages.append({
         "role": "assistant",
         "content": last_message,
         "timestamp": timestamp_now
     })
+
+    # Force scroll to latest message by rerunning
+    st.experimental_rerun()
 
 

@@ -79,3 +79,4 @@ if send_btn and user_input:
     # Auto-scroll simulation by re-running the app
     st.experimental_rerun()
 
+

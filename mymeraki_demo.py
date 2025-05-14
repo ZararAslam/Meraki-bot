@@ -26,9 +26,11 @@ user_input = st.text_input(
 )
 
 # Handle user input and fetch assistant response
-if user_input:
-    # Save user message
+if user_input and user_input.strip():
+    # Append user message immediately
     st.session_state.messages.append({"role": "user", "content": user_input})
+    # Clear the input box instantly
+    st.session_state["input"] = ""
 
     # Send to OpenAI
     openai.beta.threads.messages.create(
@@ -51,7 +53,7 @@ if user_input:
             break
         time.sleep(1)
 
-    # Retrieve assistant messages
+    # Retrieve assistant reply and append
     messages = openai.beta.threads.messages.list(
         thread_id=st.session_state.thread_id
     )
@@ -62,5 +64,9 @@ if user_input:
 for msg in st.session_state.messages:
     role = "🧑" if msg["role"] == "user" else "🤖"
     st.write(f"{role}: {msg['content']}")
+for msg in st.session_state.messages:
+    role = "🧑" if msg["role"] == "user" else "🤖"
+    st.write(f"{role}: {msg['content']}")
+
 
 

@@ -28,23 +28,6 @@ if "thread_id" not in st.session_state:
 # Display messages ABOVE input
 chat_placeholder = st.container()
 
-# Input box at the bottom (mimicking WhatsApp style)
-st.markdown("""
-<style>
-    .stTextInput>div>div>input {
-        background-color: #fceeea;
-        border: none;
-        border-radius: 18px;
-        padding: 12px;
-        font-size: 16px;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-with st.form(key="chat_form", clear_on_submit=True):
-    user_input = st.text_input("", placeholder="Type your message here...")
-    send_btn = st.form_submit_button("Send")
-
 # Show existing messages first
 with chat_placeholder:
     for msg in st.session_state.messages:
@@ -62,6 +45,43 @@ with chat_placeholder:
             """,
             unsafe_allow_html=True
         )
+
+# Style for sleek chat bubble input fixed to bottom
+st.markdown("""
+<style>
+    .chat-input-container {
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        text-align: center;
+    }
+    .chat-input-box input {
+        width: 60%;
+        padding: 12px 20px;
+        border-radius: 25px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        background-color: #fceeea;
+    }
+    .chat-send-button {
+        padding: 8px 20px;
+        font-size: 16px;
+        margin-left: 10px;
+        border-radius: 25px;
+        border: none;
+        background-color: #7b4e45;
+        color: white;
+        cursor: pointer;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Create bottom input UI
+st.markdown("<div class='chat-input-container'>", unsafe_allow_html=True)
+user_input = st.text_input("", placeholder="Type your message here...", key="input", label_visibility="collapsed")
+send_btn = st.button("Send", key="send")
+st.markdown("</div>", unsafe_allow_html=True)
 
 # Process message (append user's message BEFORE getting bot reply)
 if send_btn and user_input:
@@ -124,5 +144,4 @@ if send_btn and user_input:
         "content": last_message,
         "timestamp": timestamp_now
     })
-
 

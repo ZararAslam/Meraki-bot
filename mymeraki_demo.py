@@ -25,12 +25,45 @@ if "thread_id" not in st.session_state:
     st.session_state.thread_id = thread.id
     st.session_state.messages = []
 
-# Input box (bottom)
+# Display messages ABOVE input
+chat_placeholder = st.container()
+
+# Input box at the bottom (mimicking WhatsApp style)
+st.markdown("""
+<style>
+    .stTextInput>div>div>input {
+        background-color: #fceeea;
+        border: none;
+        border-radius: 18px;
+        padding: 12px;
+        font-size: 16px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 with st.form(key="chat_form", clear_on_submit=True):
-    user_input = st.text_input("Type your message here...", key="input")
+    user_input = st.text_input("", placeholder="Type your message here...")
     send_btn = st.form_submit_button("Send")
 
-# Process message
+# Show existing messages first
+with chat_placeholder:
+    for msg in st.session_state.messages:
+        align = "right" if msg["role"] == "user" else "left"
+        bubble_color = "#fceeea" if msg["role"] == "user" else "#f5f5f5"
+        timestamp = msg.get("timestamp", "")
+        st.markdown(
+            f"""
+            <div style='text-align: {align}; padding: 4px;'>
+                <div style='display: inline-block; background: {bubble_color}; padding: 10px 14px; margin: 4px; border-radius: 18px; max-width: 75%; font-family: sans-serif;'>
+                    <div>{msg['content']}</div>
+                    <div style='font-size: 10px; color: #888; text-align: right; margin-top: 4px;'>{timestamp}</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+# Process message (append user's message BEFORE getting bot reply)
 if send_btn and user_input:
     timestamp_now = datetime.now().strftime("%H:%M")
     st.session_state.messages.append({
@@ -39,6 +72,26 @@ if send_btn and user_input:
         "timestamp": timestamp_now
     })
 
+    # Refresh chat immediately after user sends message
+    chat_placeholder.empty()
+    with chat_placeholder:
+        for msg in st.session_state.messages:
+            align = "right" if msg["role"] == "user" else "left"
+            bubble_color = "#fceeea" if msg["role"] == "user" else "#f5f5f5"
+            timestamp = msg.get("timestamp", "")
+            st.markdown(
+                f"""
+                <div style='text-align: {align}; padding: 4px;'>
+                    <div style='display: inline-block; background: {bubble_color}; padding: 10px 14px; margin: 4px; border-radius: 18px; max-width: 75%; font-family: sans-serif;'>
+                        <div>{msg['content']}</div>
+                        <div style='font-size: 10px; color: #888; text-align: right; margin-top: 4px;'>{timestamp}</div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    # Send user message to OpenAI
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
         role="user",
@@ -71,24 +124,5 @@ if send_btn and user_input:
         "content": last_message,
         "timestamp": timestamp_now
     })
-
-# Display messages
-chat_placeholder = st.empty()
-with chat_placeholder.container():
-    for msg in st.session_state.messages:
-        align = "right" if msg["role"] == "user" else "left"
-        bubble_color = "#fceeea" if msg["role"] == "user" else "#f5f5f5"
-        timestamp = msg.get("timestamp", "")
-        st.markdown(
-            f"""
-            <div style='text-align: {align}; padding: 4px;'>
-                <div style='display: inline-block; background: {bubble_color}; padding: 10px 14px; margin: 4px; border-radius: 18px; max-width: 75%; font-family: sans-serif;'>
-                    <div>{msg['content']}</div>
-                    <div style='font-size: 10px; color: #888; text-align: right; margin-top: 4px;'>{timestamp}</div>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
 
 

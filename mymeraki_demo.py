@@ -7,10 +7,20 @@ from datetime import datetime
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 
-# Page setup
+# Page setup: white background + icon
 st.set_page_config(page_title="MyMeraki AI Chat", layout="wide", page_icon="💬")
 
-# CSS: sticky header/footer, chat bubbles, spacing
+# --- Force white background everywhere ---
+st.markdown("""
+<style>
+/* Streamlit container classes */
+body, .stApp, .css-18e3th9, .css-1d391kg, .block-container {
+  background-color: white !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# --- CSS: sticky header/footer, chat bubbles, spacing ---
 st.markdown("""
 <style>
 .fixed-header {
@@ -37,20 +47,21 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Header (logo)
+# --- Sticky logo only (no title/text) ---
 st.markdown("<div class='fixed-header'>", unsafe_allow_html=True)
 st.image("meraki-logo.png", width=180)
 st.markdown("</div>", unsafe_allow_html=True)
-# Push chat below header
+
+# push chat below the header
 st.markdown("<div class='spacer-top'></div>", unsafe_allow_html=True)
 
-# Initialize session state
+# --- Session state setup ---
 if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
     st.session_state.messages = []
 
-# Display chat messages
+# --- Show chat bubbles ---
 def show_messages():
     for msg in st.session_state.messages:
         align = "right" if msg["role"] == "user" else "left"
@@ -66,28 +77,30 @@ def show_messages():
         """, unsafe_allow_html=True)
 
 show_messages()
-# Spacer so last message isn't hidden
+
+# bottom spacer so last bubble isn't hidden
 st.markdown("<div class='spacer-bottom'></div>", unsafe_allow_html=True)
 
-# Input at bottom: always starts empty
+# --- Fixed footer input (Enter to send only) ---
 st.markdown("<div class='fixed-footer'><div class='chat-input'>", unsafe_allow_html=True)
 user_input = st.text_input(
     label="",
     placeholder="Type your message here...",
-    value="",  # cleared each run
+    value="",
     key="chat_input",
     label_visibility="collapsed"
 )
 st.markdown("</div></div>", unsafe_allow_html=True)
 
-# On enter: send
-def send_message(text):
+# --- On Enter: append user, call OpenAI, append assistant ---
+if user_input and user_input.strip():
     ts = datetime.now().strftime("%H:%M")
-    st.session_state.messages.append({"role":"user","content":text,"timestamp":ts})
+    st.session_state.messages.append({"role":"user","content":user_input,"timestamp":ts})
+
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
         role="user",
-        content=text
+        content=user_input
     )
     run = openai.beta.threads.runs.create(
         thread_id=st.session_state.thread_id,
@@ -106,7 +119,6 @@ def send_message(text):
     reply = resp.data[0].content[0].text.value
     st.session_state.messages.append({"role":"assistant","content":reply,"timestamp":datetime.now().strftime("%H:%M")})
 
-if user_input and user_input.strip():
-    send_message(user_input)
-    # no experimental_rerun needed; Streamlit auto-reruns on widget change
+    # no need for explicit rerun; Streamlit auto-reruns on text_input change
+
   

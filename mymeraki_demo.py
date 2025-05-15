@@ -7,10 +7,43 @@ from datetime import datetime
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 
+# Inject WhatsApp-style CSS
+st.markdown("""
+    <style>
+    .user-bubble {
+        background-color: #DCF8C6;
+        color: black;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px 0;
+        max-width: 80%;
+        margin-left: auto;
+        text-align: right;
+    }
+    .bot-bubble {
+        background-color: #F1F0F0;
+        color: black;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px 0;
+        max-width: 80%;
+        margin-right: auto;
+        text-align: left;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Display centered company logo
-st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; padding-bottom: 10px;'>", unsafe_allow_html=True)
 st.image("meraki-logo.png", width=180)
 st.markdown("</div>", unsafe_allow_html=True)
+
+# Add a demo notice
+st.markdown("""
+<div style="background-color: #fff8dc; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px;">
+    <strong>Note:</strong> This is just a basic demo layout to test the knowledge and query handling capabilities of the Meraki AI bot. The final layout will not look like this.
+</div>
+""", unsafe_allow_html=True)
 
 # Initialize session state for threads and messages
 if "thread_id" not in st.session_state:
@@ -23,9 +56,7 @@ def send_message():
     user_input = st.session_state.input
     if not user_input:
         return
-    # Append user message immediately
     st.session_state.messages.append({"role": "user", "content": user_input})
-    # Call OpenAI
     openai.beta.threads.messages.create(
         thread_id=st.session_state.thread_id,
         role="user",
@@ -44,11 +75,9 @@ def send_message():
             if status.status == "completed":
                 break
             time.sleep(1)
-    # Append assistant reply
     resp = openai.beta.threads.messages.list(thread_id=st.session_state.thread_id)
     reply = resp.data[0].content[0].text.value
     st.session_state.messages.append({"role": "assistant", "content": reply})
-    # Clear input box
     st.session_state.input = ""
 
 # Input field with on_change callback
@@ -60,9 +89,11 @@ st.text_input(
     label_visibility="collapsed"
 )
 
-# Display chat history
+# Display chat history with styled bubbles
 for msg in st.session_state.messages:
-    prefix = "Customer🧑" if msg["role"] == "user" else "Meraki🤖"
-    st.write(f"{prefix}: {msg['content']}")
+    if msg["role"] == "user":
+        st.markdown(f"<div class='user-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<div class='bot-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
 
 

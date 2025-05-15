@@ -42,13 +42,6 @@ st.markdown("<div style='text-align: center; padding-bottom: 10px;'>", unsafe_al
 st.image("meraki-logo.png", width=180)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Add a demo notice
-st.markdown("""
-<div style="background-color: #fff8dc; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px;">
-    <strong>Note:</strong> This is just a basic demo layout to test the knowledge and query handling capabilities of the Meraki AI. The final visual layout will not look like this.
-</div>
-""", unsafe_allow_html=True)
-
 # Initialize session state for threads and messages
 if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
@@ -84,6 +77,13 @@ def send_message():
     st.session_state.messages.append({"role": "assistant", "content": reply})
     st.session_state.input = ""
 
+# Display chat history above input
+for msg in st.session_state.messages:
+    if msg["role"] == "user":
+        st.markdown(f"<div class='user-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<div class='bot-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
+
 # Input field with on_change callback
 st.text_input(
     label="",
@@ -93,11 +93,9 @@ st.text_input(
     label_visibility="collapsed"
 )
 
-# Display chat history with adjusted bubble widths
-for msg in st.session_state.messages:
-    if msg["role"] == "user":
-        st.markdown(f"<div class='user-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
-    else:
-        st.markdown(f"<div class='bot-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
-
-
+# Add a demo notice below input
+st.markdown("""
+<div style="background-color: #fff8dc; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 15px;">
+    <strong>Note:</strong> This is just a basic demo layout to test the knowledge and query handling capabilities of the Meraki AI. The final visual layout will not look like this.
+</div>
+""", unsafe_allow_html=True)

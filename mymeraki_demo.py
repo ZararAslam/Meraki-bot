@@ -1,6 +1,7 @@
 import streamlit as st
 import openai
 import time
+import markdown2  # Added to convert markdown to HTML
 from datetime import datetime
 
 # Configure OpenAI
@@ -82,7 +83,9 @@ for msg in st.session_state.messages:
     if msg["role"] == "user":
         st.markdown(f"<div class='user-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
     else:
-        st.markdown(f"<div class='bot-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
+        # Convert markdown to HTML before displaying
+        html = markdown2.markdown(msg["content"])
+        st.markdown(f"<div class='bot-bubble'>{html}</div>", unsafe_allow_html=True)
 
 # Input field with on_change callback
 st.text_input(

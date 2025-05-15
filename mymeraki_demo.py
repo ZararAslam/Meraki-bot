@@ -62,7 +62,7 @@ st.text_input(
 
 # Display chat history
 for msg in st.session_state.messages:
-    prefix = "🧑" if msg["role"] == "user" else "🤖"
+    prefix = "Customer" if msg["role"] == "user" else "Meraki"
     st.write(f"{prefix}: {msg['content']}")
 
 

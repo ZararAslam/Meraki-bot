@@ -15,9 +15,9 @@ st.markdown("""
         display: inline-block;
         background-color: #DCF8C6;
         color: black;
-        padding: 10px 14px;
+        padding: 10px;
         border-radius: 10px;
-        margin: 4px 0;
+        margin: 5px 0;
         max-width: 80%;
         white-space: pre-wrap;
         word-wrap: break-word;
@@ -27,9 +27,9 @@ st.markdown("""
         display: inline-block;
         background-color: #F1F0F0;
         color: black;
-        padding: 10px 14px;
+        padding: 10px;
         border-radius: 10px;
-        margin: 4px 0;  /* tighter vertical spacing */
+        margin: 5px 0;
         max-width: 80%;
         white-space: pre-wrap;
         word-wrap: break-word;

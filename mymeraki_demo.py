@@ -45,7 +45,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 # Add a demo notice
 st.markdown("""
 <div style="background-color: #fff8dc; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px;">
-    <strong>Note:</strong> This is just a basic demo layout to test the knowledge and query handling capabilities of the Meraki AI bot. The final visual layout will not look like this.
+    <strong>Note:</strong> This is just a basic demo layout to test the knowledge and query handling capabilities of the Meraki AI. The final visual layout will not look like this.
 </div>
 """, unsafe_allow_html=True)
 

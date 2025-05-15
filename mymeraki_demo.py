@@ -7,27 +7,31 @@ from datetime import datetime
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 ASSISTANT_ID = "asst_55Y5vz9URwhOKhGNszdZjW6c"
 
-# Inject WhatsApp-style CSS
+# Inject WhatsApp-style CSS with inline-block bubbles
 st.markdown("""
     <style>
     .user-bubble {
+        display: inline-block;
         background-color: #DCF8C6;
         color: black;
         padding: 10px;
         border-radius: 10px;
         margin: 5px 0;
         max-width: 80%;
-        margin-left: auto;
-        text-align: right;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        text-align: left;
     }
     .bot-bubble {
+        display: inline-block;
         background-color: #F1F0F0;
         color: black;
         padding: 10px;
         border-radius: 10px;
         margin: 5px 0;
         max-width: 80%;
-        margin-right: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
         text-align: left;
     }
     </style>
@@ -89,7 +93,7 @@ st.text_input(
     label_visibility="collapsed"
 )
 
-# Display chat history with styled bubbles
+# Display chat history with adjusted bubble widths
 for msg in st.session_state.messages:
     if msg["role"] == "user":
         st.markdown(f"<div class='user-bubble'>{msg['content']}</div>", unsafe_allow_html=True)

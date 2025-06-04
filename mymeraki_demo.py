@@ -376,7 +376,6 @@ try:
     st.image("meraki-logo.png", width=200)
 except:
     st.markdown("### 🏢 MyMeraki Customer Support AI")
-st.markdown('<p style="color: #666; font-size: 18px; margin-top: 10px;">Intelligent Customer Support Assistant</p>')
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Chat messages container

@@ -371,12 +371,12 @@ def send_message():
     st.session_state.is_processing = False
 
 # Header with logo
-st.markdown('<div class="header-container">', unsafe_allow_html=True)
+st.markdown('<div style="text-align: center; margin-bottom: 30px;">', unsafe_allow_html=True)
 try:
     st.image("meraki-logo.png", width=200)
 except:
     st.markdown("### 🏢 MyMeraki Customer Support AI")
-st.markdown("#### Intelligent Customer Support Assistant")
+st.markdown('<p style="color: #666; font-size: 18px; margin-top: 10px;">Intelligent Customer Support Assistant</p>')
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Chat messages container

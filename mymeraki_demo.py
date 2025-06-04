@@ -122,8 +122,7 @@ st.markdown("""
     
     /* Markdown styling within bot bubbles */
     .bot-bubble h1, .bot-bubble h2, .bot-bubble h3 {
-        margin-top: 8px;
-        margin-bottom: 8px;
+        margin: 0 0 4px 0;
         color: #B8860B;
     }
     
@@ -133,8 +132,13 @@ st.markdown("""
     }
     
     .bot-bubble ul, .bot-bubble ol {
-        margin: 8px 0;
+        margin: 4px 0;
         padding-left: 20px;
+    }
+    
+    .bot-bubble li {
+        margin: 0;
+        padding: 0;
     }
     
     .bot-bubble code {
@@ -152,16 +156,25 @@ st.markdown("""
         border-radius: 6px;
         border-left: 4px solid #D4AF37;
         overflow-x: auto;
-        margin: 8px 0;
+        margin: 4px 0;
     }
     
     /* Remove extra spacing from bot bubble content */
     .bot-bubble * {
-        margin-bottom: 0;
+        margin-bottom: 0 !important;
     }
     
     .bot-bubble *:last-child {
-        margin-bottom: 0;
+        margin-bottom: 0 !important;
+    }
+    
+    /* Ensure tight spacing for all elements */
+    .bot-bubble > *:first-child {
+        margin-top: 0 !important;
+    }
+    
+    .bot-bubble > *:last-child {
+        margin-bottom: 0 !important;
     }
     
     /* Timestamp styling */

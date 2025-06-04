@@ -390,19 +390,11 @@ with st.container():
                 </div>
             """, unsafe_allow_html=True)
         else:
-            # Convert markdown to HTML for assistant messages
-            try:
-                html_content = markdown2.markdown(
-                    msg['content'], 
-                    extras=['fenced-code-blocks', 'tables', 'code-friendly']
-                )
-            except:
-                html_content = msg['content']
-            
+            # Use plain text for bot messages too, just like user messages
             st.markdown(f"""
                 <div class="message-container bot-container">
                     <div>
-                        <div class="bot-bubble">{html_content}</div>
+                        <div class="bot-bubble">{msg['content']}</div>
                         <div class="timestamp">{msg.get('timestamp', '')}</div>
                     </div>
                 </div>

@@ -7,7 +7,7 @@ from datetime import datetime
 # Page configuration
 st.set_page_config(
     page_title="MyMeraki Customer Support AI",
-    page_icon="💎",
+    page_icon="🏢",
     layout="wide"
 )
 
@@ -390,11 +390,19 @@ with st.container():
                 </div>
             """, unsafe_allow_html=True)
         else:
-            # Use plain text for bot messages too, just like user messages
+            # Convert markdown to HTML for assistant messages
+            try:
+                html_content = markdown2.markdown(
+                    msg['content'], 
+                    extras=['fenced-code-blocks', 'tables', 'code-friendly']
+                )
+            except:
+                html_content = msg['content']
+            
             st.markdown(f"""
                 <div class="message-container bot-container">
                     <div>
-                        <div class="bot-bubble">{msg['content']}</div>
+                        <div class="bot-bubble">{html_content}</div>
                         <div class="timestamp">{msg.get('timestamp', '')}</div>
                     </div>
                 </div>

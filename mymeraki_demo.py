@@ -120,61 +120,44 @@ st.markdown("""
         vertical-align: top;
     }
     
-    /* Markdown styling within bot bubbles */
-    .bot-bubble h1, .bot-bubble h2, .bot-bubble h3 {
-        margin: 0 0 4px 0;
-        color: #B8860B;
+    /* Completely reset all spacing in bot bubbles */
+    .bot-bubble * {
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1.4 !important;
     }
     
-    .bot-bubble p {
-        margin: 0;
-        padding: 0;
+    .bot-bubble h1, .bot-bubble h2, .bot-bubble h3 {
+        color: #B8860B !important;
+        margin-bottom: 4px !important;
     }
     
     .bot-bubble ul, .bot-bubble ol {
-        margin: 4px 0;
-        padding-left: 20px;
+        padding-left: 20px !important;
+        margin: 4px 0 !important;
     }
     
     .bot-bubble li {
-        margin: 0;
-        padding: 0;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     
     .bot-bubble code {
-        background-color: #F8F6F0;
-        padding: 2px 4px;
-        border-radius: 4px;
-        font-family: 'Courier New', monospace;
-        font-size: 13px;
-        color: #B8860B;
+        background-color: #F8F6F0 !important;
+        padding: 2px 4px !important;
+        border-radius: 4px !important;
+        font-family: 'Courier New', monospace !important;
+        font-size: 13px !important;
+        color: #B8860B !important;
     }
     
     .bot-bubble pre {
-        background-color: #FAFAFA;
-        padding: 8px;
-        border-radius: 6px;
-        border-left: 4px solid #D4AF37;
-        overflow-x: auto;
-        margin: 4px 0;
-    }
-    
-    /* Remove extra spacing from bot bubble content */
-    .bot-bubble * {
-        margin-bottom: 0 !important;
-    }
-    
-    .bot-bubble *:last-child {
-        margin-bottom: 0 !important;
-    }
-    
-    /* Ensure tight spacing for all elements */
-    .bot-bubble > *:first-child {
-        margin-top: 0 !important;
-    }
-    
-    .bot-bubble > *:last-child {
-        margin-bottom: 0 !important;
+        background-color: #FAFAFA !important;
+        padding: 8px !important;
+        border-radius: 6px !important;
+        border-left: 4px solid #D4AF37 !important;
+        overflow-x: auto !important;
+        margin: 4px 0 !important;
     }
     
     /* Timestamp styling */

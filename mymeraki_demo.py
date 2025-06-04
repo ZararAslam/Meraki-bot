@@ -437,7 +437,7 @@ st.text_input(
 st.markdown("""
 <div class="demo-notice">
     <strong>📝 Note:</strong> This is a demo of MyMeraki Customer Support AI backend capabilities. 
-    The final frontend will have a more polished design. For specific product information or custom features, 
+    The final frontend will have a more polished design. For adding specific product information or custom features, 
     please contact us at <strong>hello@altorix.co.uk</strong>
 </div>
 """, unsafe_allow_html=True)

@@ -39,9 +39,10 @@ st.markdown("""
         text-align: center;
         padding: 20px 0;
         margin-bottom: 20px;
-        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        background: linear-gradient(135deg, #FAFAFA, #F5F5F5);
         border-radius: 15px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border: 1px solid #E8E8E8;
     }
     
     /* Message bubbles */
@@ -60,14 +61,14 @@ st.markdown("""
     }
     
     .user-bubble {
-        background: linear-gradient(135deg, #007bff, #0056b3);
+        background: linear-gradient(135deg, #D4AF37, #B8860B);
         color: white;
         padding: 12px 16px;
         border-radius: 18px 18px 4px 18px;
         max-width: 70%;
         min-width: 50px;
         word-wrap: break-word;
-        box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+        box-shadow: 0 2px 8px rgba(212,175,55,0.4);
         font-size: 14px;
         line-height: 1.4;
         display: inline-block;
@@ -88,8 +89,8 @@ st.markdown("""
     }
     
     .bot-bubble {
-        background: linear-gradient(135deg, #FFFFFF, #F8F9FA);
-        color: #333333;
+        background: linear-gradient(135deg, #FAFAFA, #F5F5F5);
+        color: #2C2C2C;
         padding: 12px 16px;
         border-radius: 18px 18px 18px 4px;
         max-width: 70%;
@@ -98,7 +99,7 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         font-size: 14px;
         line-height: 1.4;
-        border: 1px solid #E0E0E0;
+        border: 1px solid #E8E8E8;
         display: inline-block;
         text-align: left;
         white-space: pre-wrap;
@@ -109,7 +110,7 @@ st.markdown("""
     .bot-bubble h1, .bot-bubble h2, .bot-bubble h3 {
         margin-top: 8px;
         margin-bottom: 8px;
-        color: #007bff;
+        color: #B8860B;
     }
     
     .bot-bubble p {
@@ -123,19 +124,19 @@ st.markdown("""
     }
     
     .bot-bubble code {
-        background-color: #F0F8FF;
+        background-color: #F8F6F0;
         padding: 2px 4px;
         border-radius: 4px;
         font-family: 'Courier New', monospace;
         font-size: 13px;
-        color: #007bff;
+        color: #B8860B;
     }
     
     .bot-bubble pre {
-        background-color: #F8F9FA;
+        background-color: #FAFAFA;
         padding: 8px;
         border-radius: 6px;
-        border-left: 4px solid #007bff;
+        border-left: 4px solid #D4AF37;
         overflow-x: auto;
         margin: 8px 0;
     }
@@ -160,27 +161,27 @@ st.markdown("""
     /* Input styling */
     .stTextInput > div > div > input {
         border-radius: 25px;
-        border: 2px solid #E0E0E0;
+        border: 2px solid #E8E8E8;
         padding: 12px 20px;
         font-size: 14px;
         background-color: #FAFAFA;
     }
     
     .stTextInput > div > div > input:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        border-color: #D4AF37;
+        box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
     }
     
     /* Spinner styling */
     .stSpinner > div {
         text-align: center;
-        color: #007bff;
+        color: #D4AF37;
     }
     
     /* Demo notice styling */
     .demo-notice {
-        background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
-        border: 1px solid #90CAF9;
+        background: linear-gradient(135deg, #FDF8E7, #F9F1D7);
+        border: 1px solid #D4AF37;
         border-radius: 12px;
         padding: 16px;
         margin: 20px 0;
@@ -188,7 +189,7 @@ st.markdown("""
     }
     
     .demo-notice strong {
-        color: #1565C0;
+        color: #B8860B;
     }
     
     /* Typing indicator */
@@ -242,12 +243,12 @@ st.markdown("""
     }
     
     .chat-messages::-webkit-scrollbar-thumb {
-        background: #007bff;
+        background: #D4AF37;
         border-radius: 10px;
     }
     
     .chat-messages::-webkit-scrollbar-thumb:hover {
-        background: #0056b3;
+        background: #B8860B;
     }
     
     /* Logo styling */

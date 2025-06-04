@@ -7,7 +7,7 @@ from datetime import datetime
 # Page configuration
 st.set_page_config(
     page_title="MyMeraki Customer Support AI",
-    page_icon="🏢",
+    page_icon="💎",
     layout="wide"
 )
 
